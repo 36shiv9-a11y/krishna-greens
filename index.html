@@ -3,63 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krishna Greens - Online Mandi</title>
+    <title>Krishna Greens - Smart Mandi</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
         :root { --primary: #1b5e20; --secondary: #ffc107; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #f4f7f6; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #f4f7f6; padding-bottom: 100px; }
         header { background: var(--primary); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; }
-        .store-title { font-size: 26px; font-weight: bold; margin: 0; }
         
-        /* Search Box Style */
-        .search-container { padding: 15px; background: white; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        #searchInput { width: 90%; max-width: 500px; padding: 12px; border: 2px solid #ddd; border-radius: 25px; font-size: 16px; outline: none; }
-        #searchInput:focus { border-color: var(--primary); }
+        .search-container { padding: 10px; background: white; text-align: center; }
+        #searchInput { width: 85%; padding: 12px; border: 2px solid #ddd; border-radius: 25px; outline: none; }
 
-        .container { padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; max-width: 1000px; margin: auto; }
-        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; }
-        .card img { width: 100%; height: 120px; object-fit: cover; }
-        .card h3 { margin: 10px 0 5px; font-size: 1.1em; color: #333; }
-        .card .price { color: #1b5e20; font-weight: bold; font-size: 1.2em; margin-bottom: 10px; }
-        .order-btn { background: var(--secondary); border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 90%; margin-bottom: 12px; }
+        .container { padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; max-width: 1000px; margin: auto; }
+        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; padding-bottom: 10px; border: 1px solid #eee; }
+        .card img { width: 100%; height: 110px; object-fit: cover; }
+        .card h3 { margin: 8px 0 2px; font-size: 1em; }
+        .card .price { color: #1b5e20; font-weight: bold; margin-bottom: 8px; }
+        
+        .add-btn { background: var(--secondary); border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; }
 
-        /* Modal */
-        #orderModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 25px; border-radius: 15px; width: 85%; max-width: 400px; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
-        .submit-btn { width: 100%; background: #1b5e20; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        /* Floating Cart Footer */
+        .cart-footer { position: fixed; bottom: 0; width: 100%; background: white; box-shadow: 0 -2px 15px rgba(0,0,0,0.2); padding: 15px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+        .total-box { font-size: 18px; font-weight: bold; color: #1b5e20; }
+        .checkout-btn { background: #1b5e20; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* Bill Modal */
+        #orderModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
+        .bill-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding: 5px 0; font-size: 14px; }
+        input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="store-title">KRISHNA GREENS</div>
-    <p style="margin:5px 0 0; font-size:14px;">Taaza Sabziyan, Seedha Khet Se</p>
+    <div style="font-size: 24px; font-weight: bold;">KRISHNA GREENS</div>
 </header>
 
 <div class="search-container">
-    <input type="text" id="searchInput" placeholder="Sabzi ka naam likhein (e.g. Aloo)..." onkeyup="filterProducts()">
+    <input type="text" id="searchInput" placeholder="Sabzi dhoondhein..." onkeyup="filterProducts()">
 </div>
 
 <div class="container" id="product-list">
-    <div style="grid-column: 1/-1; text-align: center; padding: 50px;">Sabziyan load ho rahi hain...</div>
+    <p style="grid-column: 1/-1; text-align: center;">Loading Fresh Vegetables...</p>
+</div>
+
+<div class="cart-footer">
+    <div class="total-box">Bill: ₹<span id="totalAmount">0</span></div>
+    <button class="checkout-btn" onclick="openModal()">Order Karein (<span id="cartCount">0</span>)</button>
 </div>
 
 <div id="orderModal">
     <div class="modal-content">
-        <h2 id="modalTitle" style="margin:0; color: #1b5e20;">Order</h2>
+        <h3 style="text-align: center; color: #1b5e20;">Aapka Bill</h3>
+        <div id="billDetails"></div>
+        <hr>
+        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; margin: 10px 0;">
+            <span>Total:</span> <span>₹<span id="modalTotal">0</span></span>
+        </div>
+        
         <form action="https://formspree.io/f/xyknwkyy" method="POST">
-            <input type="hidden" name="Item" id="hiddenItemName">
+            <input type="hidden" name="Full_Bill_Details" id="hiddenBill">
+            <input type="hidden" name="Grand_Total" id="hiddenTotal">
             <input type="text" name="Name" placeholder="Aapka Naam" required>
             <input type="tel" name="Mobile" placeholder="WhatsApp Number" required>
-            <input type="text" name="Address" placeholder="Delivery Address" required>
-            <select name="Qty">
-                <option value="500g">500 gram</option>
-                <option value="1kg">1 kg</option>
-                <option value="2kg">2 kg</option>
-            </select>
-            <button type="submit" class="submit-btn">ORDER CONFIRM</button>
-            <p onclick="closeModal()" style="text-align:center; color:red; cursor:pointer; margin-top:15px;">CANCEL</p>
+            <input type="text" name="Address" placeholder="Pura Pata" required>
+            <button type="submit" class="checkout-btn" style="width: 100%; margin-top: 10px;">CONFIRM ORDER</button>
+            <p onclick="closeModal()" style="text-align: center; color: red; cursor: pointer; margin-top: 10px;">CANCEL</p>
         </form>
     </div>
 </div>
@@ -67,22 +76,17 @@
 <script>
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1yv8ViLGwqpPNntMkoORlWRKxDuID6fdr-ySIYejUrfA/gviz/tq?tqx=out:csv';
     let allProducts = [];
+    let cart = {};
 
     const photos = {
         'aloo': 'https://images.unsplash.com/photo-1518977676601-b53f02bad675?w=400',
         'tamatar': 'https://images.unsplash.com/photo-1561131245-c9e250121ad9?w=400',
         'pyaz': 'https://images.unsplash.com/photo-1508747703725-719777637510?w=400',
-        'mirch': 'https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=400',
-        'dhaniya': 'https://images.unsplash.com/photo-1588873285777-9963c1cf390a?w=400',
+        'hari mirch': 'https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=400',
+        'bhindi': 'https://images.unsplash.com/photo-1425036458755-dc303a604201?w=400',
         'default': 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400'
     };
 
-    function getImg(n) {
-        let name = n.toLowerCase().trim();
-        return photos[name] || photos['default'];
-    }
-
-    // Data Load Function
     Papa.parse(sheetUrl, {
         download: true,
         header: true,
@@ -95,38 +99,63 @@
     function displayProducts(products) {
         const list = document.getElementById('product-list');
         list.innerHTML = '';
-        if(products.length === 0) {
-            list.innerHTML = '<p style="grid-column:1/-1;">Koi sabzi nahi mili.</p>';
-            return;
-        }
         products.forEach(item => {
             const div = document.createElement('div');
             div.className = 'card';
+            const img = photos[item.Name.toLowerCase().trim()] || photos['default'];
             div.innerHTML = `
-                <img src="${getImg(item.Name)}" alt="${item.Name}">
+                <img src="${img}" alt="${item.Name}">
                 <h3>${item.Name}</h3>
-                <div class="price">₹${item.Price} /kg</div>
-                <button class="order-btn" onclick="openModal('${item.Name}')">ORDER</button>
+                <div class="price">₹${item.Price}/kg</div>
+                <button class="add-btn" onclick="addToCart('${item.Name}', ${item.Price})">+ Add 1kg</button>
             `;
             list.appendChild(div);
         });
     }
 
-    // Search Function
+    function addToCart(name, price) {
+        if(cart[name]) { cart[name].qty += 1; }
+        else { cart[name] = { price: price, qty: 1 }; }
+        updateCartUI();
+    }
+
+    function updateCartUI() {
+        let total = 0;
+        let count = 0;
+        for(let item in cart) {
+            total += cart[item].price * cart[item].qty;
+            count += cart[item].qty;
+        }
+        document.getElementById('totalAmount').innerText = total;
+        document.getElementById('cartCount').innerText = count;
+    }
+
+    function openModal() {
+        if(Object.keys(cart).length === 0) { alert("Pehle kuch add toh kariye!"); return; }
+        document.getElementById('orderModal').style.display = 'flex';
+        let billHtml = "";
+        let billText = "";
+        let total = 0;
+        
+        for(let item in cart) {
+            let subtotal = cart[item].price * cart[item].qty;
+            total += subtotal;
+            billHtml += `<div class="bill-item"><span>${item} (${cart[item].qty}kg)</span> <span>₹${subtotal}</span></div>`;
+            billText += `${item}: ${cart[item].qty}kg - ₹${subtotal} | `;
+        }
+        
+        document.getElementById('billDetails').innerHTML = billHtml;
+        document.getElementById('modalTotal').innerText = total;
+        document.getElementById('hiddenBill').value = billText;
+        document.getElementById('hiddenTotal').value = total;
+    }
+
+    function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
+    
     function filterProducts() {
         const term = document.getElementById('searchInput').value.toLowerCase();
         const filtered = allProducts.filter(p => p.Name.toLowerCase().includes(term));
         displayProducts(filtered);
-    }
-
-    function openModal(name) {
-        document.getElementById('orderModal').style.display = 'flex';
-        document.getElementById('modalTitle').innerText = name;
-        document.getElementById('hiddenItemName').value = name;
-    }
-
-    function closeModal() {
-        document.getElementById('orderModal').style.display = 'none';
     }
 </script>
 </body>
