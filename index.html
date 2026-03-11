@@ -3,75 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krishna Greens - Fresh Vegetables</title>
+    <title>Krishna Greens - Online Mandi</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
         :root { --primary: #1b5e20; --secondary: #ffc107; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #f0f2f5; }
-        header { background: var(--primary); color: white; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .store-title { font-size: 28px; font-weight: 800; margin: 0; letter-spacing: 1px; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #f4f7f6; }
+        header { background: var(--primary); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; }
+        .store-title { font-size: 26px; font-weight: bold; margin: 0; }
+        
+        /* Search Box Style */
+        .search-container { padding: 15px; background: white; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        #searchInput { width: 90%; max-width: 500px; padding: 12px; border: 2px solid #ddd; border-radius: 25px; font-size: 16px; outline: none; }
+        #searchInput:focus { border-color: var(--primary); }
+
         .container { padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; max-width: 1000px; margin: auto; }
-        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border: 1px solid #e0e0e0; transition: 0.3s; }
-        .card:hover { transform: scale(1.02); }
-        .card img { width: 100%; height: 130px; object-fit: cover; background: #fafafa; }
+        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; }
+        .card img { width: 100%; height: 120px; object-fit: cover; }
         .card h3 { margin: 10px 0 5px; font-size: 1.1em; color: #333; }
         .card .price { color: #1b5e20; font-weight: bold; font-size: 1.2em; margin-bottom: 10px; }
-        .order-btn { background: var(--secondary); border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 85%; margin-bottom: 12px; font-size: 14px; transition: 0.2s; }
-        .order-btn:active { background: #e0ac08; }
+        .order-btn { background: var(--secondary); border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 90%; margin-bottom: 12px; }
 
-        /* Order Form */
+        /* Modal */
         #orderModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 25px; border-radius: 15px; width: 85%; max-width: 400px; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        .submit-btn { width: 100%; background: #1b5e20; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
-        .close-btn { color: #d32f2f; display: block; text-align: center; margin-top: 15px; cursor: pointer; font-weight: bold; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        .submit-btn { width: 100%; background: #1b5e20; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <header>
     <div class="store-title">KRISHNA GREENS</div>
-    <div style="font-size: 14px; opacity: 0.9;">Shuddh aur Taaza Sabziyan</div>
+    <p style="margin:5px 0 0; font-size:14px;">Taaza Sabziyan, Seedha Khet Se</p>
 </header>
 
+<div class="search-container">
+    <input type="text" id="searchInput" placeholder="Sabzi ka naam likhein (e.g. Aloo)..." onkeyup="filterProducts()">
+</div>
+
 <div class="container" id="product-list">
-    <div style="grid-column: 1/-1; text-align: center; padding: 50px;">Sabziyan dhoondh rahe hain...</div>
+    <div style="grid-column: 1/-1; text-align: center; padding: 50px;">Sabziyan load ho rahi hain...</div>
 </div>
 
 <div id="orderModal">
     <div class="modal-content">
-        <h2 id="modalTitle" style="margin-top:0; color: #1b5e20;">Order</h2>
+        <h2 id="modalTitle" style="margin:0; color: #1b5e20;">Order</h2>
         <form action="https://formspree.io/f/xyknwkyy" method="POST">
-            <input type="hidden" name="Product_Name" id="hiddenItemName">
+            <input type="hidden" name="Item" id="hiddenItemName">
             <input type="text" name="Name" placeholder="Aapka Naam" required>
             <input type="tel" name="Mobile" placeholder="WhatsApp Number" required>
-            <input type="text" name="Address" placeholder="Ghar ka Pata" required>
+            <input type="text" name="Address" placeholder="Delivery Address" required>
             <select name="Qty">
                 <option value="500g">500 gram</option>
                 <option value="1kg">1 kg</option>
                 <option value="2kg">2 kg</option>
-                <option value="5kg">5 kg</option>
             </select>
             <button type="submit" class="submit-btn">ORDER CONFIRM</button>
-            <span class="close-btn" onclick="closeModal()">CANCEL</span>
+            <p onclick="closeModal()" style="text-align:center; color:red; cursor:pointer; margin-top:15px;">CANCEL</p>
         </form>
     </div>
 </div>
 
 <script>
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1yv8ViLGwqpPNntMkoORlWRKxDuID6fdr-ySIYejUrfA/gviz/tq?tqx=out:csv';
+    let allProducts = [];
 
     const photos = {
         'aloo': 'https://images.unsplash.com/photo-1518977676601-b53f02bad675?w=400',
-        'potato': 'https://images.unsplash.com/photo-1518977676601-b53f02bad675?w=400',
         'tamatar': 'https://images.unsplash.com/photo-1561131245-c9e250121ad9?w=400',
-        'tomato': 'https://images.unsplash.com/photo-1561131245-c9e250121ad9?w=400',
         'pyaz': 'https://images.unsplash.com/photo-1508747703725-719777637510?w=400',
-        'onion': 'https://images.unsplash.com/photo-1508747703725-719777637510?w=400',
-        'adrak': 'https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=400',
-        'ginger': 'https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=400',
         'mirch': 'https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=400',
-        'chilli': 'https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=400',
+        'dhaniya': 'https://images.unsplash.com/photo-1588873285777-9963c1cf390a?w=400',
         'default': 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400'
     };
 
@@ -80,27 +82,42 @@
         return photos[name] || photos['default'];
     }
 
+    // Data Load Function
     Papa.parse(sheetUrl, {
         download: true,
         header: true,
         complete: function(results) {
-            const list = document.getElementById('product-list');
-            list.innerHTML = '';
-            results.data.forEach(row => {
-                if(row.Name && row.Price) {
-                    const div = document.createElement('div');
-                    div.className = 'card';
-                    div.innerHTML = `
-                        <img src="${getImg(row.Name)}" alt="${row.Name}">
-                        <h3>${row.Name}</h3>
-                        <div class="price">₹${row.Price} /kg</div>
-                        <button class="order-btn" onclick="openModal('${row.Name}')">ORDER KAREIN</button>
-                    `;
-                    list.appendChild(div);
-                }
-            });
+            allProducts = results.data.filter(row => row.Name && row.Price);
+            displayProducts(allProducts);
         }
     });
+
+    function displayProducts(products) {
+        const list = document.getElementById('product-list');
+        list.innerHTML = '';
+        if(products.length === 0) {
+            list.innerHTML = '<p style="grid-column:1/-1;">Koi sabzi nahi mili.</p>';
+            return;
+        }
+        products.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.innerHTML = `
+                <img src="${getImg(item.Name)}" alt="${item.Name}">
+                <h3>${item.Name}</h3>
+                <div class="price">₹${item.Price} /kg</div>
+                <button class="order-btn" onclick="openModal('${item.Name}')">ORDER</button>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    // Search Function
+    function filterProducts() {
+        const term = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = allProducts.filter(p => p.Name.toLowerCase().includes(term));
+        displayProducts(filtered);
+    }
 
     function openModal(name) {
         document.getElementById('orderModal').style.display = 'flex';
@@ -112,6 +129,5 @@
         document.getElementById('orderModal').style.display = 'none';
     }
 </script>
-
 </body>
 </html>
