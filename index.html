@@ -3,58 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krishna Greens - Smart Billing</title>
+    <title>Krishna Greens - Digital Billing</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
         :root { --primary: #1b5e20; --secondary: #ffc107; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #f4f7f6; padding-bottom: 100px; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #f4f7f6; padding-bottom: 110px; }
+        
         header { background: var(--primary); color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; }
         
+        /* Search Bar */
+        .search-container { padding: 12px; background: white; text-align: center; border-bottom: 1px solid #ddd; position: sticky; top: 58px; z-index: 999; }
+        #searchInput { width: 90%; max-width: 400px; padding: 12px; border: 2px solid #eee; border-radius: 25px; outline: none; font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
         .container { padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; max-width: 1000px; margin: auto; }
-        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; padding: 10px; border: 1px solid #eee; }
-        .card img { width: 100%; height: 110px; object-fit: cover; border-radius: 8px; background: #f9f9f9; }
-        .card h3 { margin: 10px 0 5px; font-size: 1.1em; text-transform: capitalize; }
+        .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; }
+        .card img { width: 100%; height: 120px; object-fit: cover; background: #fafafa; }
+        .card h3 { margin: 10px 0 2px; font-size: 1.1em; color: #333; }
         .card .price { color: #1b5e20; font-weight: bold; margin-bottom: 10px; }
         
-        .weight-inputs { display: flex; justify-content: center; align-items: center; gap: 5px; margin-bottom: 10px; }
-        .weight-inputs input { width: 45px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
-        .weight-inputs label { font-size: 11px; font-weight: bold; color: #666; }
+        /* KG/Gram Inputs */
+        .weight-inputs { display: flex; justify-content: center; align-items: center; gap: 5px; margin-bottom: 12px; }
+        .weight-inputs input { width: 50px; padding: 8px; border: 1px solid #ccc; border-radius: 6px; text-align: center; font-weight: bold; }
+        .weight-inputs label { font-size: 12px; font-weight: bold; color: #555; }
 
-        .add-btn { background: var(--secondary); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s; }
-        .add-btn:active { transform: scale(0.95); }
+        .add-btn { background: var(--secondary); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 90%; margin-bottom: 10px; }
 
-        .cart-bar { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); box-sizing: border-box; z-index: 1000; }
-        .checkout-btn { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        /* Floating Bill Bar */
+        .cart-bar { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -3px 15px rgba(0,0,0,0.1); z-index: 1000; box-sizing: border-box; border-radius: 20px 20px 0 0; }
+        .total-info { font-size: 18px; font-weight: bold; color: var(--primary); }
+        .checkout-btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; }
 
-        #billModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 380px; max-height: 85vh; overflow-y: auto; }
-        .bill-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding: 8px 0; font-size: 14px; }
+        /* D-Mart Style Receipt Modal */
+        #billModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 90%; max-width: 380px; max-height: 85vh; overflow-y: auto; }
+        .bill-header { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 10px; margin-bottom: 15px; }
+        .bill-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+        
+        .confirm-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer; font-size: 16px; }
     </style>
 </head>
 <body>
 
-<header><div style="font-size: 22px; font-weight: 900;">KRISHNA GREENS</div></header>
+<header>
+    <div style="font-size: 24px; font-weight: 900;">KRISHNA GREENS</div>
+</header>
+
+<div class="search-container">
+    <input type="text" id="searchInput" placeholder="Sabzi dhoondhein (e.g. Aloo)..." onkeyup="filterProducts()">
+</div>
 
 <div class="container" id="product-list"></div>
 
 <div class="cart-bar">
-    <div style="font-weight:bold; color:#1b5e20; font-size: 1.1em;">Bill: ₹<span id="totalDisplay">0</span></div>
+    <div class="total-info">Total: ₹<span id="totalDisplay">0</span></div>
     <button class="checkout-btn" onclick="openBill()">Order Karein</button>
 </div>
 
 <div id="billModal">
     <div class="modal-content">
-        <h3 style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px;">KRISHNA GREENS RECEIPT</h3>
-        <div id="billItems"></div>
-        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; margin: 15px 0; color: #1b5e20;">
-            <span>Grand Total:</span> <span>₹<span id="modalGrandTotal">0</span></span>
+        <div class="bill-header">
+            <h2 style="margin: 0; color: #1b5e20;">KRISHNA GREENS</h2>
+            <p style="margin: 5px 0 0; font-weight: bold;">CASH MEMO / RECEIPT</p>
         </div>
+        
+        <div id="billItems"></div>
+        
+        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 20px; margin: 20px 0; color: #1b5e20; border-top: 2px solid #333; padding-top: 10px;">
+            <span>GRAND TOTAL:</span> <span>₹<span id="modalGrandTotal">0</span></span>
+        </div>
+        
         <form action="https://formspree.io/f/xyknwkyy" method="POST">
-            <input type="hidden" name="Order_Summary" id="hiddenBillText">
-            <input type="text" name="Name" placeholder="Aapka Naam" required style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px; box-sizing: border-box;">
-            <input type="tel" name="Mobile" placeholder="WhatsApp Number" required style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px; box-sizing: border-box;">
-            <button type="submit" class="checkout-btn" style="width: 100%; padding: 15px;">CONFIRM & SEND ORDER</button>
-            <p onclick="closeBill()" style="text-align: center; color: red; cursor: pointer; margin-top: 15px; font-weight: bold;">Cancel</p>
+            <input type="hidden" name="Full_Bill_Data" id="hiddenBillText">
+            <input type="text" name="Name" placeholder="Aapka Naam" required style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:10px; box-sizing: border-box;">
+            <input type="tel" name="Mobile" placeholder="WhatsApp No." required style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:10px; box-sizing: border-box;">
+            <button type="submit" class="confirm-btn">PLACE ORDER NOW</button>
+            <p onclick="closeBill()" style="text-align: center; color: red; cursor: pointer; margin-top: 15px; font-weight: bold;">← Edit Items</p>
         </form>
     </div>
 </div>
@@ -63,20 +86,15 @@
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1yv8ViLGwqpPNntMkoORlWRKxDuID6fdr-ySIYejUrfA/gviz/tq?tqx=out:csv';
     let allProducts = [], cart = {};
 
-    // Fixed Image Library - Matar ki photo ab sahi aayegi
     const photos = {
         'aloo': 'https://images.unsplash.com/photo-1518977676601-b53f02bad675?w=400',
         'tamatar': 'https://images.unsplash.com/photo-1561131245-c9e250121ad9?w=400',
         'pyaz': 'https://images.unsplash.com/photo-1508747703725-719777637510?w=400',
         'matar': 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=400',
         'gajar': 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400',
-        'baingan': 'https://images.unsplash.com/photo-1628102371158-b76e1919830f?w=400',
-        'bhindi': 'https://images.unsplash.com/photo-1425036458755-dc303a604201?w=400',
         'hari mirch': 'https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=400',
-        'dhaniya': 'https://images.unsplash.com/photo-1588873285777-9963c1cf390a?w=400',
+        'bhindi': 'https://img.freepik.com/free-photo/lady-finger-okra-fresh-vegetable_1203-9092.jpg?w=400',
         'adrak': 'https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=400',
-        'gobhi': 'https://images.unsplash.com/photo-1568584711271-6c929fb49b60?w=400',
-        'kaddu': 'https://images.unsplash.com/photo-1506807803488-8eafc15316c7?w=400',
         'default': 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400'
     };
 
@@ -97,7 +115,7 @@
             const div = document.createElement('div');
             div.className = 'card';
             div.innerHTML = `
-                <img src="${imgSrc}" alt="${item.Name}">
+                <img src="${imgSrc}">
                 <h3>${item.Name}</h3>
                 <div class="price">₹${item.Price}/kg</div>
                 <div class="weight-inputs">
@@ -113,22 +131,15 @@
     function addToCart(name, price, index) {
         const kg = parseFloat(document.getElementById(`kg-${index}`).value) || 0;
         const gm = parseFloat(document.getElementById(`gm-${index}`).value) || 0;
-        if(kg === 0 && gm === 0) { alert("Pehle KG ya Gram bhariye!"); return; }
+        if(kg === 0 && gm === 0) { alert("Wazan likhiye!"); return; }
 
         const totalWeight = kg + (gm / 1000);
         cart[name] = { price: price, kg: kg, gm: gm, totalWeight: totalWeight };
         updateUI();
         
-        // Button feedback
         const btn = document.querySelectorAll('.add-btn')[index];
-        btn.innerText = "Added ✓";
-        btn.style.background = "#4CAF50";
-        btn.style.color = "white";
-        setTimeout(() => { 
-            btn.innerText = "Add to Bill"; 
-            btn.style.background = "#ffc107";
-            btn.style.color = "black";
-        }, 1000);
+        btn.innerText = "Added ✓"; btn.style.background = "#4CAF50";
+        setTimeout(() => { btn.innerText = "Add to Bill"; btn.style.background = "#ffc107"; }, 1000);
     }
 
     function updateUI() {
@@ -137,17 +148,22 @@
         document.getElementById('totalDisplay').innerText = total.toFixed(2);
     }
 
+    function filterProducts() {
+        const term = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = allProducts.filter(p => p.Name.toLowerCase().includes(term));
+        displayProducts(filtered);
+    }
+
     function openBill() {
-        if(Object.keys(cart).length === 0) { alert("Aapne kuch bhi add nahi kiya hai!"); return; }
+        if(Object.keys(cart).length === 0) { alert("Cart khali hai!"); return; }
         document.getElementById('billModal').style.display = 'flex';
         let html = "", text = "", grand = 0;
-
         for(let key in cart) {
             let rowTotal = cart[key].price * cart[key].totalWeight;
             grand += rowTotal;
-            let weightInfo = `${cart[key].kg > 0 ? cart[key].kg + 'kg ' : ''}${cart[key].gm > 0 ? cart[key].gm + 'gm' : ''}`;
+            let weightInfo = `${cart[key].kg > 0 ? cart[key].kg+'kg ' : ''}${cart[key].gm > 0 ? cart[key].gm+'gm' : ''}`;
             html += `<div class="bill-item"><span>${key} (${weightInfo})</span> <span>₹${rowTotal.toFixed(2)}</span></div>`;
-            text += `${key}: ${weightInfo} (₹${rowTotal.toFixed(2)}), `;
+            text += `${key}: ${weightInfo} = ₹${rowTotal.toFixed(2)} | `;
         }
         document.getElementById('billItems').innerHTML = html;
         document.getElementById('modalGrandTotal').innerText = grand.toFixed(2);
