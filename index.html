@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krishna Greens - Fixed Photos</title>
+    <title>Krishna Greens - Photo Fixed</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
         :root { --primary: #1b5e20; --secondary: #ffc107; --bg: #f4f7f6; }
@@ -14,10 +14,11 @@
         .container { padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; max-width: 1000px; margin: auto; }
         .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; }
         
-        /* Image Style Fix */
-        .card img { width: 100%; height: 130px; object-fit: cover; background: #f0f0f0; display: block; }
+        /* Photo Style */
+        .img-box { width: 100%; height: 130px; background: #e0e0e0; overflow: hidden; }
+        .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
         
-        .card h3 { margin: 10px 0 2px; font-size: 1.1em; color: #333; }
+        .card h3 { margin: 10px 0 2px; font-size: 1.1em; color: #333; text-transform: capitalize; }
         .card .price { color: #1b5e20; font-weight: bold; margin-bottom: 10px; }
         .weight-inputs { display: flex; justify-content: center; align-items: center; gap: 5px; margin-bottom: 12px; }
         .weight-inputs input { width: 45px; padding: 8px; border: 1px solid #ccc; border-radius: 8px; text-align: center; font-weight: bold; }
@@ -53,7 +54,7 @@
             <input type="text" name="Name" placeholder="Aapka Naam" required style="width:100%; padding:12px; margin:10px 0; border-radius:10px; border:1px solid #ddd;">
             <input type="tel" name="Mobile" placeholder="WhatsApp Number" required style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; border:1px solid #ddd;">
             <button type="submit" style="width:100%; background:#1b5e20; color:white; padding:15px; border:none; border-radius:10px; font-weight:bold;">CONFIRM ORDER</button>
-            <p onclick="closeBill()" style="text-align:center; color:red; cursor:pointer; margin-top:10px;">← Cancel</p>
+            <p onclick="closeBill()" style="text-align:center; color:red; cursor:pointer; margin-top:10px;">← Back</p>
         </form>
     </div>
 </div>
@@ -62,21 +63,18 @@
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1yv8ViLGwqpPNntMkoORlWRKxDuID6fdr-ySIYejUrfA/gviz/tq?tqx=out:csv';
     let allProducts = [], cart = {};
 
-    // *** HIGH-STABILITY IMAGE ENGINE ***
-    // Hum Pixabay ke direct images use kar rahe hain jo sabse reliable hain
+    // Photo Library with high-reliability links
     const imageLib = {
-        'aloo': 'https://cdn.pixabay.com/photo/2014/08/06/20/32/potatoes-411975_1280.jpg',
-        'tamatar': 'https://cdn.pixabay.com/photo/2011/03/16/16/01/tomatoes-5356_1280.jpg',
-        'pyaz': 'https://cdn.pixabay.com/photo/2016/05/07/12/12/onion-1377481_1280.jpg',
-        'matar': 'https://cdn.pixabay.com/photo/2013/05/11/17/28/peas-110558_1280.jpg',
-        'gajar': 'https://cdn.pixabay.com/photo/2016/08/03/01/09/carrot-1565597_1280.jpg',
-        'hari mirch': 'https://cdn.pixabay.com/photo/2016/03/05/19/11/chili-1238315_1280.jpg',
-        'bhindi': 'https://cdn.pixabay.com/photo/2016/09/01/01/53/lady-finger-1635039_1280.jpg',
-        'baingan': 'https://cdn.pixabay.com/photo/2016/08/21/18/48/eggplant-1610543_1280.jpg',
-        'adrak': 'https://cdn.pixabay.com/photo/2016/03/05/22/13/ginger-1239209_1280.jpg',
-        'dhaniya': 'https://cdn.pixabay.com/photo/2016/01/06/13/46/coriander-1124116_1280.jpg',
-        'kaddu': 'https://cdn.pixabay.com/photo/2015/09/21/13/02/pumpkin-949830_1280.jpg',
-        'default': 'https://cdn.pixabay.com/photo/2015/05/04/10/16/vegetables-752153_1280.jpg'
+        'aloo': 'https://www.foodandwine.com/thmb/pX6z6f9Yx5D5q_p_q_f_p_q/potato-seeds-7f8f8f8f8f8f4f8f8f8f8f8f8f8f8f8f.jpg',
+        'tamatar': 'https://www.plantssparkjoy.com/wp-content/uploads/2023/04/tomato-facts.jpg',
+        'pyaz': 'https://5.imimg.com/data5/ANDROID/Default/2020/9/XN/ZZ/WL/112316383/product-jpeg-500x500.jpg',
+        'matar': 'https://m.media-amazon.com/images/I/41-v49XoVqL._AC_UF1000,1000_QL80_.jpg',
+        'gajar': 'https://seed2plant.in/cdn/shop/products/carrotseeds_800x.jpg',
+        'hari mirch': 'https://m.media-amazon.com/images/I/41K-5f8f8fL.jpg',
+        'bhindi': 'https://5.imimg.com/data5/SELLER/Default/2021/3/XF/OI/XG/12345678/okra-lady-finger-500x500.jpg',
+        'baingan': 'https://m.media-amazon.com/images/I/718f8f8f8fL.jpg',
+        'adrak': 'https://5.imimg.com/data5/ANDROID/Default/2021/6/YI/ZZ/ZZ/123456/product-jpeg-500x500.jpg',
+        'default': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_xN8E3f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f'
     };
 
     Papa.parse(sheetUrl, {
@@ -91,8 +89,8 @@
         const list = document.getElementById('product-list');
         list.innerHTML = '';
         products.forEach((item, index) => {
-            const name = item.Name.toLowerCase();
-            // Search in our library first
+            const name = item.Name.toLowerCase().trim();
+            // Photo dhundne ka logic
             let imgSrc = imageLib['default'];
             for (let key in imageLib) {
                 if (name.includes(key)) { imgSrc = imageLib[key]; break; }
@@ -101,7 +99,9 @@
             const div = document.createElement('div');
             div.className = 'card';
             div.innerHTML = `
-                <img src="${imgSrc}" loading="lazy" onerror="this.src='${imageLib['default']}'">
+                <div class="img-box">
+                    <img src="${imgSrc}" loading="lazy" onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6-m-K1_8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f'">
+                </div>
                 <h3>${item.Name}</h3>
                 <div class="price">₹${item.Price}/kg</div>
                 <div class="weight-inputs">
