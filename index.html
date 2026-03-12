@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krishna Greens - Digital Billing</title>
+    <title>Krishna Greens - Smart Digital Billing</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
         :root { --primary: #1b5e20; --secondary: #ffc107; --bg: #f4f7f6; }
@@ -11,7 +11,7 @@
         header { background: var(--primary); color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; font-weight: 900; font-size: 22px; }
         
         .search-container { padding: 12px; background: white; text-align: center; border-bottom: 1px solid #ddd; position: sticky; top: 56px; z-index: 999; }
-        #searchInput { width: 90%; max-width: 400px; padding: 12px; border: 2px solid #eee; border-radius: 25px; outline: none; font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        #searchInput { width: 90%; max-width: 400px; padding: 12px; border: 2px solid #eee; border-radius: 25px; outline: none; font-size: 16px; }
 
         .container { padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; max-width: 1000px; margin: auto; }
         .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; }
@@ -23,7 +23,7 @@
         .weight-inputs input { width: 45px; padding: 8px; border: 1px solid #ccc; border-radius: 8px; text-align: center; font-weight: bold; }
         .weight-inputs label { font-size: 11px; font-weight: bold; color: #666; }
 
-        .add-btn { background: var(--secondary); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 90%; margin-bottom: 10px; transition: 0.3s; }
+        .add-btn { background: var(--secondary); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 90%; margin-bottom: 10px; }
 
         .cart-bar { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); z-index: 1000; box-sizing: border-box; border-radius: 20px 20px 0 0; }
         .total-info { font-size: 18px; font-weight: bold; color: var(--primary); }
@@ -33,7 +33,7 @@
         .modal-content { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 380px; max-height: 85vh; overflow-y: auto; }
         .bill-header { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 10px; margin-bottom: 15px; }
         .bill-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 14px; }
-        .confirm-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer; font-size: 16px; }
+        .confirm-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -47,26 +47,26 @@
 <div class="container" id="product-list"></div>
 
 <div class="cart-bar">
-    <div class="total-info">Bill: ₹<span id="totalDisplay">0</span></div>
+    <div class="total-info">Total Bill: ₹<span id="totalDisplay">0</span></div>
     <button class="checkout-btn" onclick="openBill()">Order Karein</button>
 </div>
 
 <div id="billModal">
     <div class="modal-content">
         <div class="bill-header">
-            <h2 style="margin:0; color:#1b5e20;">KRISHNA GREENS</h2>
-            <p style="margin:5px 0 0; font-weight:bold;">Digital Receipt</p>
+            <h2>KRISHNA GREENS</h2>
+            <p>Digital Receipt</p>
         </div>
         <div id="billItems"></div>
-        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:20px; margin:20px 0; color:#1b5e20; border-top:2px solid #333; padding-top:10px;">
+        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:20px; margin:20px 0; border-top:2px solid #333; padding-top:10px;">
             <span>GRAND TOTAL:</span> <span>₹<span id="modalGrandTotal">0</span></span>
         </div>
         <form action="https://formspree.io/f/xyknwkyy" method="POST">
             <input type="hidden" name="Order_Details" id="hiddenBillText">
-            <input type="text" name="Name" placeholder="Aapka Naam" required style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:10px; box-sizing:border-box;">
-            <input type="tel" name="Mobile" placeholder="WhatsApp Number" required style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:10px; box-sizing:border-box;">
+            <input type="text" name="Name" placeholder="Aapka Naam" required style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:10px;">
+            <input type="tel" name="Mobile" placeholder="WhatsApp No." required style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:10px;">
             <button type="submit" class="confirm-btn">CONFIRM ORDER</button>
-            <p onclick="closeBill()" style="text-align:center; color:red; cursor:pointer; margin-top:15px; font-weight:bold;">← Edit Bill</p>
+            <p onclick="closeBill()" style="text-align:center; color:red; cursor:pointer; margin-top:10px;">← Back</p>
         </form>
     </div>
 </div>
@@ -74,21 +74,6 @@
 <script>
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1yv8ViLGwqpPNntMkoORlWRKxDuID6fdr-ySIYejUrfA/gviz/tq?tqx=out:csv';
     let allProducts = [], cart = {};
-
-    // *** HIGH QUALITY FIXED PHOTOS ***
-    const photos = {
-        'aloo': 'https://images.pexels.com/photos/144248/potatoes-vegetables-market-agriculture-144248.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'tamatar': 'https://images.pexels.com/photos/533280/pexels-photo-533280.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'pyaz': 'https://images.pexels.com/photos/144249/onions-vegetables-market-agriculture-144249.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'matar': 'https://images.pexels.com/photos/255469/pexels-photo-255469.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'gajar': 'https://images.pexels.com/photos/143133/pexels-photo-143133.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'hari mirch': 'https://images.pexels.com/photos/4197444/pexels-photo-4197444.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'bhindi': 'https://cdn.pixabay.com/photo/2016/09/01/01/53/lady-finger-1635039_1280.jpg',
-        'baingan': 'https://images.pexels.com/photos/3219438/pexels-photo-3219438.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'adrak': 'https://images.pexels.com/photos/161556/ginger-root-ginger-plant-161556.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'dhaniya': 'https://images.pexels.com/photos/1084284/pexels-photo-1084284.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'default': 'https://images.pexels.com/photos/1458694/pexels-photo-1458694.jpeg?auto=compress&cs=tinysrgb&w=400'
-    };
 
     Papa.parse(sheetUrl, {
         download: true, header: true,
@@ -102,8 +87,10 @@
         const list = document.getElementById('product-list');
         list.innerHTML = '';
         products.forEach((item, index) => {
-            const cleanName = item.Name.toLowerCase().trim();
-            const imgSrc = photos[cleanName] || photos['default'];
+            // *** DYNAMIC PHOTO SEARCH LOGIC ***
+            // Ye line aapke likhe hue naam se photo dhoondhegi
+            const imgSrc = `https://source.unsplash.com/featured/?vegetable,${item.Name.replace(/\s+/g, '')}`;
+            
             const div = document.createElement('div');
             div.className = 'card';
             div.innerHTML = `
@@ -129,7 +116,6 @@
         cart[name] = { price: price, kg: kg, gm: gm, totalWeight: totalWeight };
         updateUI();
         
-        // No alert, just change button look
         const btn = document.getElementById(`btn-${index}`);
         btn.innerText = "Added ✓"; btn.style.background = "#4CAF50"; btn.style.color = "white";
         setTimeout(() => { btn.innerText = "Add to Bill"; btn.style.background = "#ffc107"; btn.style.color = "black"; }, 1500);
@@ -148,7 +134,7 @@
     }
 
     function openBill() {
-        if(Object.keys(cart).length === 0) { alert("Pehle kuch sabzi add karein!"); return; }
+        if(Object.keys(cart).length === 0) { alert("Cart khali hai!"); return; }
         document.getElementById('billModal').style.display = 'flex';
         let html = "", text = "", grand = 0;
         for(let key in cart) {
