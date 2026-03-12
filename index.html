@@ -3,34 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Krishna Greens - Final Fixed</title>
+    <title>Krishna Greens - Digital Billing</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <style>
-        :root { --primary: #1b5e20; --secondary: #ffc107; }
-        body { font-family: sans-serif; margin: 0; background: #f0f2f5; padding-bottom: 100px; }
-        header { background: var(--primary); color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; font-weight: bold; font-size: 22px; }
+        :root { --primary: #1b5e20; --secondary: #ffc107; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: var(--bg); padding-bottom: 110px; }
+        header { background: var(--primary); color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; font-weight: 900; font-size: 22px; }
         
-        .search-container { padding: 10px; background: white; text-align: center; position: sticky; top: 55px; z-index: 999; border-bottom: 1px solid #ddd; }
-        #searchInput { width: 85%; padding: 12px; border-radius: 25px; border: 1px solid #ccc; font-size: 16px; outline: none; }
+        .search-container { padding: 12px; background: white; text-align: center; border-bottom: 1px solid #ddd; position: sticky; top: 56px; z-index: 999; }
+        #searchInput { width: 90%; max-width: 400px; padding: 12px; border: 2px solid #eee; border-radius: 25px; outline: none; font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
-        .container { padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 800px; margin: auto; }
-        .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; padding-bottom: 10px; display: flex; flex-direction: column; height: 100%; }
-        .card img { width: 100%; height: 110px; object-fit: cover; background: #eee; }
-        .card h3 { margin: 8px 0 2px; font-size: 16px; color: #333; }
-        .card .price { color: #1b5e20; font-weight: bold; margin-bottom: 8px; font-size: 14px; }
+        .container { padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; max-width: 1000px; margin: auto; }
+        .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; }
+        .card img { width: 100%; height: 120px; object-fit: cover; background: #eee; }
+        .card h3 { margin: 10px 0 2px; font-size: 1.1em; color: #333; }
+        .card .price { color: #1b5e20; font-weight: bold; margin-bottom: 10px; }
         
-        .weight-inputs { display: flex; justify-content: center; align-items: center; gap: 3px; margin-bottom: 10px; padding: 0 5px; }
-        .weight-inputs input { width: 40px; padding: 6px; border: 1px solid #bbb; border-radius: 5px; text-align: center; font-size: 14px; }
-        .weight-inputs label { font-size: 10px; font-weight: bold; }
+        .weight-inputs { display: flex; justify-content: center; align-items: center; gap: 5px; margin-bottom: 12px; }
+        .weight-inputs input { width: 45px; padding: 8px; border: 1px solid #ccc; border-radius: 8px; text-align: center; font-weight: bold; }
+        .weight-inputs label { font-size: 11px; font-weight: bold; color: #666; }
 
-        .add-btn { background: var(--secondary); border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; width: 90%; margin: auto; font-size: 13px; }
+        .add-btn { background: var(--secondary); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 90%; margin-bottom: 10px; transition: 0.3s; }
 
-        .cart-bar { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); box-sizing: border-box; }
-        .checkout-btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; }
+        .cart-bar { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); z-index: 1000; box-sizing: border-box; border-radius: 20px 20px 0 0; }
+        .total-info { font-size: 18px; font-weight: bold; color: var(--primary); }
+        .checkout-btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; }
 
-        #billModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 350px; max-height: 80vh; overflow-y: auto; }
-        .bill-item { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 8px 0; font-size: 14px; }
+        #billModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; padding: 10px; }
+        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 380px; max-height: 85vh; overflow-y: auto; }
+        .bill-header { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 10px; margin-bottom: 15px; }
+        .bill-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+        .confirm-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -44,23 +47,26 @@
 <div class="container" id="product-list"></div>
 
 <div class="cart-bar">
-    <div style="font-weight:bold; color:var(--primary);">Total: ₹<span id="totalDisplay">0</span></div>
+    <div class="total-info">Bill: ₹<span id="totalDisplay">0</span></div>
     <button class="checkout-btn" onclick="openBill()">Order Karein</button>
 </div>
 
 <div id="billModal">
     <div class="modal-content">
-        <h3 style="text-align: center; border-bottom: 2px solid #1b5e20;">KRISHNA GREENS BILL</h3>
+        <div class="bill-header">
+            <h2 style="margin:0; color:#1b5e20;">KRISHNA GREENS</h2>
+            <p style="margin:5px 0 0; font-weight:bold;">Digital Receipt</p>
+        </div>
         <div id="billItems"></div>
-        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; margin: 15px 0;">
-            <span>Total:</span> <span>₹<span id="modalGrandTotal">0</span></span>
+        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:20px; margin:20px 0; color:#1b5e20; border-top:2px solid #333; padding-top:10px;">
+            <span>GRAND TOTAL:</span> <span>₹<span id="modalGrandTotal">0</span></span>
         </div>
         <form action="https://formspree.io/f/xyknwkyy" method="POST">
-            <input type="hidden" name="Bill_Details" id="hiddenBillText">
-            <input type="text" name="Name" placeholder="Aapka Naam" required style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:5px;">
-            <input type="tel" name="Mobile" placeholder="WhatsApp No." required style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:5px;">
-            <button type="submit" class="checkout-btn" style="width: 100%;">SEND ORDER</button>
-            <p onclick="closeBill()" style="text-align: center; color: red; cursor: pointer; margin-top: 10px;">Back to Menu</p>
+            <input type="hidden" name="Order_Details" id="hiddenBillText">
+            <input type="text" name="Name" placeholder="Aapka Naam" required style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:10px; box-sizing:border-box;">
+            <input type="tel" name="Mobile" placeholder="WhatsApp Number" required style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:10px; box-sizing:border-box;">
+            <button type="submit" class="confirm-btn">CONFIRM ORDER</button>
+            <p onclick="closeBill()" style="text-align:center; color:red; cursor:pointer; margin-top:15px; font-weight:bold;">← Edit Bill</p>
         </form>
     </div>
 </div>
@@ -69,18 +75,19 @@
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1yv8ViLGwqpPNntMkoORlWRKxDuID6fdr-ySIYejUrfA/gviz/tq?tqx=out:csv';
     let allProducts = [], cart = {};
 
-    // *** FINAL TESTED PHOTOS ***
+    // *** HIGH QUALITY FIXED PHOTOS ***
     const photos = {
-        'aloo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Patatas_u_u_u.jpg/320px-Patatas_u_u_u.jpg',
-        'tamatar': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Tomato_je.jpg/320px-Tomato_je.jpg',
-        'pyaz': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Red_onion.jpg/320px-Red_onion.jpg',
-        'matar': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Fresh_peas_in_pods_2.jpg/320px-Fresh_peas_in_pods_2.jpg',
-        'gajar': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Carrots_%28USDA%29.jpg/320px-Carrots_%28USDA%29.jpg',
-        'bhindi': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Abelmoschus_esculentus_at_market.jpg/320px-Abelmoschus_esculentus_at_market.jpg',
-        'baingan': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Aubergine_fruit.jpg/320px-Aubergine_fruit.jpg',
-        'hari mirch': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Green_Chili_at_Market.jpg/320px-Green_Chili_at_Market.jpg',
-        'adrak': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Gemberwortel.jpg/320px-Gemberwortel.jpg',
-        'default': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Vegetable_market_2.jpg/320px-Vegetable_market_2.jpg'
+        'aloo': 'https://images.pexels.com/photos/144248/potatoes-vegetables-market-agriculture-144248.jpeg?auto=compress&cs=tinysrgb&w=400',
+        'tamatar': 'https://images.pexels.com/photos/533280/pexels-photo-533280.jpeg?auto=compress&cs=tinysrgb&w=400',
+        'pyaz': 'https://images.pexels.com/photos/144249/onions-vegetables-market-agriculture-144249.jpeg?auto=compress&cs=tinysrgb&w=400',
+        'matar': 'https://images.pexels.com/photos/255469/pexels-photo-255469.jpeg?auto=compress&cs=tinysrgb&w=400',
+        'gajar': 'https://images.pexels.com/photos/143133/pexels-photo-143133.jpeg?auto=compress&cs=tinysrgb&w=400',
+        'hari mirch': 'https://images.pexels.com/photos/4197444/pexels-photo-4197444.jpeg?auto=compress&cs=tinysrgb&w=400',
+        'bhindi': 'https://cdn.pixabay.com/photo/2016/09/01/01/53/lady-finger-1635039_1280.jpg',
+        'baingan': 'https://images.pexels.com/photos/3219438/pexels-photo-3219438.jpeg?auto=compress&cs=tinysrgb&w=400',
+        'adrak': 'https://images.pexels.com/photos/161556/ginger-root-ginger-plant-161556.jpeg?auto=compress&cs=tinysrgb&w=400',
+        'dhaniya': 'https://images.pexels.com/photos/1084284/pexels-photo-1084284.jpeg?auto=compress&cs=tinysrgb&w=400',
+        'default': 'https://images.pexels.com/photos/1458694/pexels-photo-1458694.jpeg?auto=compress&cs=tinysrgb&w=400'
     };
 
     Papa.parse(sheetUrl, {
@@ -100,14 +107,14 @@
             const div = document.createElement('div');
             div.className = 'card';
             div.innerHTML = `
-                <img src="${imgSrc}">
+                <img src="${imgSrc}" alt="${item.Name}">
                 <h3>${item.Name}</h3>
                 <div class="price">₹${item.Price}/kg</div>
                 <div class="weight-inputs">
                     <input type="number" id="kg-${index}" placeholder="0" min="0"> <label>KG</label>
                     <input type="number" id="gm-${index}" placeholder="0" min="0" step="50"> <label>GM</label>
                 </div>
-                <button class="add-btn" onclick="addToCart('${item.Name}', ${item.Price}, ${index})">Add to Bill</button>
+                <button class="add-btn" id="btn-${index}" onclick="addToCart('${item.Name}', ${item.Price}, ${index})">Add to Bill</button>
             `;
             list.appendChild(div);
         });
@@ -117,16 +124,21 @@
         const kg = parseFloat(document.getElementById(`kg-${index}`).value) || 0;
         const gm = parseFloat(document.getElementById(`gm-${index}`).value) || 0;
         if(kg === 0 && gm === 0) return;
+
         const totalWeight = kg + (gm / 1000);
         cart[name] = { price: price, kg: kg, gm: gm, totalWeight: totalWeight };
         updateUI();
-        alert(name + " add ho gaya!");
+        
+        // No alert, just change button look
+        const btn = document.getElementById(`btn-${index}`);
+        btn.innerText = "Added ✓"; btn.style.background = "#4CAF50"; btn.style.color = "white";
+        setTimeout(() => { btn.innerText = "Add to Bill"; btn.style.background = "#ffc107"; btn.style.color = "black"; }, 1500);
     }
 
     function updateUI() {
         let total = 0;
         for(let key in cart) { total += cart[key].price * cart[key].totalWeight; }
-        document.getElementById('totalDisplay').innerText = total.toFixed(0);
+        document.getElementById('totalDisplay').innerText = total.toFixed(2);
     }
 
     function filterProducts() {
@@ -136,19 +148,19 @@
     }
 
     function openBill() {
-        if(Object.keys(cart).length === 0) return;
+        if(Object.keys(cart).length === 0) { alert("Pehle kuch sabzi add karein!"); return; }
         document.getElementById('billModal').style.display = 'flex';
         let html = "", text = "", grand = 0;
         for(let key in cart) {
             let rowTotal = cart[key].price * cart[key].totalWeight;
             grand += rowTotal;
-            let wt = `${cart[key].kg}kg ${cart[key].gm}gm`;
-            html += `<div class="bill-item"><span>${key} (${wt})</span> <span>₹${rowTotal.toFixed(0)}</span></div>`;
-            text += `${key} (${wt}): ₹${rowTotal.toFixed(0)} | `;
+            let weight = `${cart[key].kg > 0 ? cart[key].kg+'kg ' : ''}${cart[key].gm > 0 ? cart[key].gm+'gm' : ''}`;
+            html += `<div class="bill-item"><span>${key} (${weight})</span> <span>₹${rowTotal.toFixed(2)}</span></div>`;
+            text += `${key} (${weight}): ₹${rowTotal.toFixed(2)} | `;
         }
         document.getElementById('billItems').innerHTML = html;
-        document.getElementById('modalGrandTotal').innerText = grand.toFixed(0);
-        document.getElementById('hiddenBillText').value = text + " Total: ₹" + grand.toFixed(0);
+        document.getElementById('modalGrandTotal').innerText = grand.toFixed(2);
+        document.getElementById('hiddenBillText').value = text + " Total: ₹" + grand.toFixed(2);
     }
 
     function closeBill() { document.getElementById('billModal').style.display = 'none'; }
