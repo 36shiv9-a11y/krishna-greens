@@ -10,34 +10,31 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: var(--bg); padding-bottom: 110px; }
         header { background: var(--primary); color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; font-weight: bold; font-size: 22px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         
-        /* Search Bar Style */
+        /* Search Bar */
         .search-container { padding: 12px; background: white; text-align: center; border-bottom: 1px solid #ddd; position: sticky; top: 56px; z-index: 999; }
-        #searchInput { width: 90%; max-width: 400px; padding: 12px; border: 2px solid #eee; border-radius: 25px; outline: none; font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.3s; }
-        #searchInput:focus { border-color: var(--primary); }
+        #searchInput { width: 90%; max-width: 400px; padding: 12px; border: 2px solid #eee; border-radius: 25px; outline: none; font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
         .container { padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; max-width: 1000px; margin: auto; }
         
-        /* Product Card Style */
-        .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; transition: 0.3s; }
+        /* Product Card */
+        .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; }
         .img-box { width: 100%; height: 130px; background: #f9f9f9; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .card img { width: 100%; height: 100%; object-fit: cover; }
         .card h3 { margin: 10px 0 2px; font-size: 1.1em; color: #333; text-transform: capitalize; }
-        .price { color: #1b5e20; font-weight: bold; margin-bottom: 10px; font-size: 0.95em; }
+        .price { color: #1b5e20; font-weight: bold; margin-bottom: 10px; }
         
-        /* Weight Inputs */
+        /* Inputs */
         .weight-inputs { display: flex; justify-content: center; align-items: center; gap: 5px; margin-bottom: 12px; }
-        .weight-inputs input { width: 45px; padding: 8px; border: 1px solid #ccc; border-radius: 8px; text-align: center; font-weight: bold; background: #fff; }
-        .weight-inputs small { font-weight: bold; color: #666; }
+        .weight-inputs input { width: 45px; padding: 8px; border: 1px solid #ccc; border-radius: 8px; text-align: center; font-weight: bold; }
 
-        .add-btn { background: var(--secondary); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 90%; margin-bottom: 10px; transition: 0.2s; }
-        .add-btn:active { transform: scale(0.95); }
+        .add-btn { background: var(--secondary); border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 90%; margin-bottom: 10px; }
 
-        /* Cart Bar */
+        /* Bottom Bar */
         .cart-bar { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); z-index: 1000; box-sizing: border-box; border-radius: 20px 20px 0 0; }
         
-        /* Modal Style */
+        /* Modal */
         #billModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 90%; max-width: 380px; max-height: 85vh; overflow-y: auto; position: relative; }
+        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 90%; max-width: 380px; max-height: 80vh; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -45,31 +42,30 @@
 <header>KRISHNA GREENS</header>
 
 <div class="search-container">
-    <input type="text" id="searchInput" placeholder="Sabzi dhoondhein (Aloo, Baingan...)" onkeyup="filterProducts()">
+    <input type="text" id="searchInput" placeholder="Sabzi dhoondhein..." onkeyup="filterProducts()">
 </div>
 
 <div class="container" id="product-list"></div>
 
 <div class="cart-bar">
     <div style="font-size: 18px; font-weight: bold; color: var(--primary);">Total: ₹<span id="totalDisplay">0</span></div>
-    <button onclick="openBill()" style="background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 12px; font-weight: bold; cursor: pointer;">Order Karein</button>
+    <button onclick="openBill()" style="background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 12px; font-weight: bold;">Order Karein</button>
 </div>
 
 <div id="billModal">
     <div class="modal-content">
-        <h2 style="text-align:center; color:#1b5e20; margin-top: 0;">Apka Bill</h2>
+        <h2 style="text-align:center; color:#1b5e20;">Apka Bill</h2>
         <div id="billItems"></div>
-        <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
-        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:18px; margin-bottom: 20px;">
+        <hr>
+        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:18px;">
             <span>Grand Total:</span> <span>₹<span id="modalGrandTotal">0</span></span>
         </div>
-        
         <form action="https://formspree.io/f/xyknwkyy" method="POST">
             <input type="hidden" name="Order_Details" id="hiddenBillText">
-            <input type="text" name="Customer_Name" placeholder="Aapka Naam" required style="width:100%; padding:12px; margin-bottom:12px; border-radius:10px; border:1px solid #ddd; box-sizing: border-box;">
-            <input type="tel" name="WhatsApp_No" placeholder="WhatsApp No." required style="width:100%; padding:12px; margin-bottom:20px; border-radius:10px; border:1px solid #ddd; box-sizing: border-box;">
-            <button type="submit" style="width:100%; background:#1b5e20; color:white; padding:15px; border:none; border-radius:10px; font-weight:bold; font-size:16px; cursor: pointer;">CONFIRM ORDER</button>
-            <p onclick="closeBill()" style="text-align:center; color:red; cursor:pointer; margin-top:15px; font-weight: bold;">Piche Jayein</p>
+            <input type="text" name="Name" placeholder="Aapka Naam" required style="width:100%; padding:12px; margin:15px 0 10px; border-radius:10px; border:1px solid #ddd;">
+            <input type="tel" name="Mobile" placeholder="WhatsApp No." required style="width:100%; padding:12px; margin-bottom:15px; border-radius:10px; border:1px solid #ddd;">
+            <button type="submit" style="width:100%; background:#1b5e20; color:white; padding:15px; border:none; border-radius:10px; font-weight:bold;">CONFIRM ORDER</button>
+            <p onclick="closeBill()" style="text-align:center; color:red; cursor:pointer; margin-top:15px;">Piche Jayein</p>
         </form>
     </div>
 </div>
@@ -78,7 +74,6 @@
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1yv8ViLGwqpPNntMkoORlWRKxDuID6fdr-ySIYejUrfA/gviz/tq?tqx=out:csv';
     let allProducts = [], cart = {};
 
-    // Google Sheet se data load karna
     Papa.parse(sheetUrl, {
         download: true, header: true,
         complete: function(results) {
@@ -87,7 +82,6 @@
         }
     });
 
-    // Products dikhane ka function
     function displayProducts(products) {
         const list = document.getElementById('product-list');
         list.innerHTML = '';
@@ -95,10 +89,13 @@
             const nameFromSheet = item.Name.trim();
             const nameLower = nameFromSheet.toLowerCase();
             
-            // PHOTO LOGIC: GitHub par upload ki gayi file ke naam ke mutabik
+            // Sabse pehle normal naam try karega
             let imgSrc = `${nameFromSheet}.jpg`; 
-            
-            // Special Cases Fix (Jaisa aapne upload kiya hai)
+
+            // PHOTO FIXES: In case GitHub names are different
+            if (nameLower === "aloo") imgSrc = "aloo.jpg"; 
+            if (nameLower === "dhaniya") imgSrc = "Dhaniya.jpg";
+            if (nameLower === "matar") imgSrc = "Matar.jpg";
             if (nameLower === "tamatar") imgSrc = "Tamatar .jpg";
             if (nameLower === "hari mirch") imgSrc = "Hari Mirch.jpg";
             if (nameLower === "phool gobhi") imgSrc = "phool gobhi .jpg";
@@ -117,8 +114,8 @@
                 <h3>${nameFromSheet}</h3>
                 <div class="price">₹${item.Price}/kg</div>
                 <div class="weight-inputs">
-                    <input type="number" id="kg-${index}" placeholder="0" min="0"> <small>KG</small>
-                    <input type="number" id="gm-${index}" placeholder="0" min="0"> <small>GM</small>
+                    <input type="number" id="kg-${index}" placeholder="0"> <small>KG</small>
+                    <input type="number" id="gm-${index}" placeholder="0"> <small>GM</small>
                 </div>
                 <button class="add-btn" id="btn-${index}" onclick="addToCart('${nameFromSheet}', ${item.Price}, ${index})">Add to Bill</button>
             `;
@@ -126,23 +123,19 @@
         });
     }
 
-    // Search Filter
     function filterProducts() {
         const term = document.getElementById('searchInput').value.toLowerCase();
         const filtered = allProducts.filter(p => p.Name.toLowerCase().includes(term));
         displayProducts(filtered);
     }
 
-    // Cart System
     function addToCart(name, price, index) {
         const kg = parseFloat(document.getElementById(`kg-${index}`).value) || 0;
         const gm = parseFloat(document.getElementById(`gm-${index}`).value) || 0;
         if(kg === 0 && gm === 0) return;
-        
         const totalWeight = kg + (gm / 1000);
         cart[name] = { price: price, totalWeight: totalWeight, kg: kg, gm: gm };
         updateTotal();
-        
         const btn = document.getElementById(`btn-${index}`);
         btn.innerText = "Added ✓"; btn.style.background = "#4CAF50";
         setTimeout(() => { btn.innerText = "Add to Bill"; btn.style.background = "#ffc107"; }, 1000);
@@ -154,26 +147,21 @@
         document.getElementById('totalDisplay').innerText = Math.round(total);
     }
 
-    // Bill Modal
     function openBill() {
-        if(Object.keys(cart).length === 0) { alert("Pehle kuch add toh kijiye!"); return; }
+        if(Object.keys(cart).length === 0) return;
         document.getElementById('billModal').style.display = 'flex';
         let html = "", text = "", grand = 0;
         for(let key in cart) {
             let rowTotal = Math.round(cart[key].price * cart[key].totalWeight);
             grand += rowTotal;
             let weightText = `${cart[key].kg > 0 ? cart[key].kg+'kg ' : ''}${cart[key].gm > 0 ? cart[key].gm+'gm' : ''}`;
-            html += `<div style="display:flex; justify-content:space-between; margin:8px 0; font-size:15px;">
-                        <span>${key} (${weightText})</span> 
-                        <span>₹${rowTotal}</span>
-                     </div>`;
+            html += `<div style="display:flex; justify-content:space-between; margin:5px 0;"><span>${key} (${weightText})</span> <span>₹${rowTotal}</span></div>`;
             text += `${key} (${weightText}): ₹${rowTotal} | `;
         }
         document.getElementById('billItems').innerHTML = html;
         document.getElementById('modalGrandTotal').innerText = grand;
         document.getElementById('hiddenBillText').value = text + " TOTAL: ₹" + grand;
     }
-
     function closeBill() { document.getElementById('billModal').style.display = 'none'; }
 </script>
 </body>
