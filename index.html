@@ -73,26 +73,25 @@
         list.innerHTML = '';
         products.forEach((item, index) => {
             const nameFromSheet = item.Name.trim();
-            const nameLower = nameFromSheet.toLowerCase();
+            const nl = nameFromSheet.toLowerCase();
             
-            // SUPER FIX: Ye code .jpg aur .JPG dono try karega
+            // Sabse pehle ye sabzi ke naam se photo dhoondhega
             let imgSrc = `${nameFromSheet}.jpg`; 
 
             // ALOO, DHANIYA, MATAR SPECIAL FIX
-            if (nameLower === "aloo") imgSrc = "Aloo.jpg"; 
-            if (nameLower === "dhaniya") imgSrc = "Dhaniya.jpg";
-            if (nameLower === "matar") imgSrc = "Matar.jpg";
-            
-            // Spaces aur baki fixes
-            if (nameLower === "tamatar") imgSrc = "Tamatar .jpg";
-            if (nameLower === "hari mirch") imgSrc = "Hari Mirch.jpg";
-            if (nameLower === "phool gobhi") imgSrc = "phool gobhi .jpg";
+            if (nl === "aloo") imgSrc = "Aloo.jpg"; 
+            if (nl === "dhaniya") imgSrc = "Dhaniya.jpg";
+            if (nl === "matar") imgSrc = "Matar.jpg";
+            if (nl === "tamatar") imgSrc = "Tamatar .jpg";
+            if (nl === "hari mirch") imgSrc = "Hari Mirch.jpg";
+            if (nl === "phool gobhi") imgSrc = "phool gobhi .jpg";
 
             const div = document.createElement('div');
             div.className = 'card';
             div.innerHTML = `
                 <div class="img-box">
-                    <img src="${imgSrc}" loading="lazy" onerror="this.src='${nameFromSheet}.JPG'; this.onerror=function(){this.src='https://via.placeholder.com/300x200?text=${nameFromSheet}'}">
+                    <img src="${imgSrc}" loading="lazy" 
+                         onerror="this.onerror=null; this.src='${nameFromSheet}.JPG'; this.onerror=function(){this.src='${nl}.jpg'; this.onerror=function(){this.src='https://via.placeholder.com/300x200?text=${nameFromSheet}'}}">
                 </div>
                 <h3>${nameFromSheet}</h3>
                 <div class="price">₹${item.Price}/kg</div>
