@@ -8,14 +8,14 @@
     <style>
         :root { --primary: #1b5e20; --secondary: #ffc107; --bg: #f4f7f6; }
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: var(--bg); padding-bottom: 110px; }
-        header { background: var(--primary); color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; font-weight: bold; font-size: 22px; }
+        header { background: var(--primary); color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; font-weight: bold; font-size: 22px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .search-container { padding: 12px; background: white; text-align: center; border-bottom: 1px solid #ddd; position: sticky; top: 56px; z-index: 999; }
         #searchInput { width: 90%; max-width: 400px; padding: 12px; border: 2px solid #eee; border-radius: 25px; outline: none; font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .container { padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; max-width: 1000px; margin: auto; }
         .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; transition: 0.3s; }
         .img-box { width: 100%; height: 130px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .card img { width: 100%; height: 100%; object-fit: cover; }
-        .card h3 { margin: 10px 0 2px; font-size: 1.1em; color: #333; }
+        .card h3 { margin: 10px 0 2px; font-size: 1.1em; color: #333; text-transform: capitalize; }
         .card .price { color: #1b5e20; font-weight: bold; margin-bottom: 10px; }
         .weight-inputs { display: flex; justify-content: center; align-items: center; gap: 5px; margin-bottom: 12px; }
         .weight-inputs input { width: 45px; padding: 8px; border: 1px solid #ccc; border-radius: 8px; text-align: center; font-weight: bold; }
@@ -60,12 +60,6 @@
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1yv8ViLGwqpPNntMkoORlWRKxDuID6fdr-ySIYejUrfA/gviz/tq?tqx=out:csv';
     let allProducts = [], cart = {};
 
-    const reliablePhotos = {
-        'aloo': 'https://5.imimg.com/data5/ANDROID/Default/2020/9/RL/XN/ZZ/112316383/product-jpeg-500x500.jpg',
-        'tamatar': 'https://5.imimg.com/data5/SELLER/Default/2023/9/344933544/VY/NM/ZY/153164137/fresh-tomato-500x500.jpg',
-        'pyaz': 'https://5.imimg.com/data5/SELLER/Default/2023/3/OI/XG/YV/24536643/fresh-onion-500x500.jpg'
-    };
-
     Papa.parse(sheetUrl, {
         download: true, header: true,
         complete: function(results) {
@@ -79,12 +73,15 @@
         list.innerHTML = '';
         products.forEach((item, index) => {
             const name = item.Name.toLowerCase().trim();
-            let imgSrc = reliablePhotos[name] || `https://via.placeholder.com/300x200?text=${item.Name}`;
+            // Ye line GitHub wali uploaded photos ko uthayegi
+            let imgSrc = `${name}.jpg`; 
 
             const div = document.createElement('div');
             div.className = 'card';
             div.innerHTML = `
-                <div class="img-box"><img src="${imgSrc}" onerror="this.src='https://via.placeholder.com/300?text=Fresh+Veggie'"></div>
+                <div class="img-box">
+                    <img src="${imgSrc}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=${item.Name}'">
+                </div>
                 <h3>${item.Name}</h3>
                 <div class="price">₹${item.Price}/kg</div>
                 <div class="weight-inputs">
@@ -102,13 +99,17 @@
         const gm = parseFloat(document.getElementById(`gm-${index}`).value) || 0;
         if(kg === 0 && gm === 0) return;
         const totalWeight = kg + (gm / 1000);
-        cart[name] = { price: price, kg: kg, gm: gm, totalWeight: totalWeight };
-        let total = 0;
-        for(let key in cart) { total += cart[key].price * cart[key].totalWeight; }
-        document.getElementById('totalDisplay').innerText = Math.round(total);
+        cart[name] = { price: price, totalWeight: totalWeight, kg: kg, gm: gm };
+        updateTotal();
         const btn = document.getElementById(`btn-${index}`);
         btn.innerText = "Added ✓"; btn.style.background = "#4CAF50";
         setTimeout(() => { btn.innerText = "Add to Bill"; btn.style.background = "#ffc107"; }, 1000);
+    }
+
+    function updateTotal() {
+        let total = 0;
+        for(let key in cart) { total += cart[key].price * cart[key].totalWeight; }
+        document.getElementById('totalDisplay').innerText = Math.round(total);
     }
 
     function filterProducts() {
@@ -124,9 +125,9 @@
         for(let key in cart) {
             let rowTotal = Math.round(cart[key].price * cart[key].totalWeight);
             grand += rowTotal;
-            let w = `${cart[key].kg > 0 ? cart[key].kg+'kg ' : ''}${cart[key].gm > 0 ? cart[key].gm+'gm' : ''}`;
-            html += `<div style="display:flex; justify-content:space-between; margin:5px 0;"><span>${key} (${w})</span> <span>₹${rowTotal}</span></div>`;
-            text += `${key} (${w}): ₹${rowTotal} | `;
+            let weightText = `${cart[key].kg > 0 ? cart[key].kg+'kg ' : ''}${cart[key].gm > 0 ? cart[key].gm+'gm' : ''}`;
+            html += `<div style="display:flex; justify-content:space-between; margin:5px 0;"><span>${key} (${weightText})</span> <span>₹${rowTotal}</span></div>`;
+            text += `${key} (${weightText}): ₹${rowTotal} | `;
         }
         document.getElementById('billItems').innerHTML = html;
         document.getElementById('modalGrandTotal').innerText = grand;
